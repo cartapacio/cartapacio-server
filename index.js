@@ -8,7 +8,14 @@ var restify = require('restify'),
 var server = restify.createServer({
   name: 'cartapacio'
 })
-server.use(restify.bodyParser({ mapParams: false }));
+server.use(restify.bodyParser({ mapParams: false }))
+server.use(restify.CORS({
+  origins: ['*'],
+  credentials: true,
+  headers: ['Access-Control-Allow-Origin:*', 'Access-Control-Allow-Methods:POST']
+}))
+server.use(restify.fullResponse())
+
 
 // config
 var PORT = 31173,

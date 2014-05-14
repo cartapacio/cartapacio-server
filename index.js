@@ -31,10 +31,12 @@ global.db = new Datastore(
 //routes
 var post = require('./routes/post')
 var get = require('./routes/get')
+var del = require('./routes/delete')
 
 // router
 server.post('/doc', post)
 server.get('/doc', get)
+server.del('/doc/:id', del)
 
 server.listen(PORT, function() {
   console.log( chalk.green(server.name + ' started @ ' + server.url) )

@@ -15,6 +15,7 @@ server.use(restify.CORS({
   headers: ['Access-Control-Allow-Origin:*', 'Access-Control-Allow-Methods:POST']
 }))
 server.use(restify.fullResponse())
+server.use(restify.queryParser());
 
 
 // config
@@ -29,10 +30,11 @@ global.db = new Datastore(
 
 //routes
 var post = require('./routes/post')
+var get = require('./routes/get')
 
 // router
-server.post('/doc/', post)
-
+server.post('/doc', post)
+server.get('/doc', get)
 
 server.listen(PORT, function() {
   console.log( chalk.green(server.name + ' started @ ' + server.url) )

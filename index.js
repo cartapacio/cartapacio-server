@@ -54,6 +54,11 @@ server.get('/doc', get)
 server.del('/doc/:id', del)
 server.put('/doc/:id', put)
 
+// static files
+server.get(/\/static\/?.*/, restify.serveStatic({
+  directory: path.relative(__dirname, global.folder)
+}));
+
 server.listen(PORT, function() {
   console.log( chalk.green(server.name + ' started @ ' + server.url) )
 });

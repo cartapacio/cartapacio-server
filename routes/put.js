@@ -1,6 +1,7 @@
 'use strict';
 
-var chalk = require('chalk')
+var chalk = require('chalk'),
+  utils = require('../utils')
 
 module.exports =  function (req, res, next) {
   console.log( chalk.gray('/ UPDATE' ) )
@@ -8,10 +9,20 @@ module.exports =  function (req, res, next) {
   res.header('Access-Control-Allow-Origin', '*')
   res.header('Access-Control-Allow-Headers', 'X-Requested-With')
 
-  global.db.update({_id:req.params.id}, req.body, function (err) {
-    if(!err){
-      res.send('ok')
-      next();
-    }
-  });
+  var doc = req.body
+
+  if(doc.doctype === 'project'){
+    utils.handleImages(doc, function (err, doc){
+      if(!err){
+        global.db.update({_id:req.params.id}, doc, function (err) {
+          if(!err){
+            res.send(doc)
+            next();
+          }
+        });
+      }
+    })
+  }
+
+
 }

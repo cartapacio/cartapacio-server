@@ -1,6 +1,8 @@
 'use strict';
 
-var chalk = require('chalk')
+var chalk = require('chalk'),
+  utils = require('../utils')
+
 
 module.exports =  function (req, res, next) {
   console.log( chalk.gray('/ POST' ) )
@@ -10,10 +12,17 @@ module.exports =  function (req, res, next) {
 
   var doc = req.body
 
-  global.db.insert(doc, function (err, newDoc) {
-    if(!err){
-      res.send(newDoc)
-      next();
-    }
-  });
+  if(doc.doctype === 'project'){
+    utils.handleImages(doc, function (err, doc){
+      if(!err){
+        global.db.insert(doc, function (err, newDoc) {
+          if(!err){
+            res.send(newDoc)
+            next();
+          }
+        });
+      }
+    })
+  }
+
 }

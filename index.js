@@ -2,6 +2,8 @@
 
 var restify = require('restify'),
   Datastore = require('nedb'),
+  path = require('path'),
+  fs = require('fs-extra'),
   chalk = require('chalk')
 
 // server config
@@ -22,9 +24,21 @@ server.use(restify.queryParser());
 var PORT = 31173,
   DB_NAME = 'cartapacio_db'
 
+// user directory
+var home = process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE
+global.folder = path.join(home, 'webpage')
+
+// if directory does not exist will be created
+try{
+  fs.lstatSync(global.folder).isDirectory()
+} catch (error) {
+  console.log( chalk.yellow('user directory does not exist, creating it ...') )
+  fs.mkdirsSync(global.folder);
+}
+
 // database
 global.db = new Datastore(
-  { filename: __dirname + '/' + DB_NAME,
+  { filename: path.join(global.folder, DB_NAME),
   autoload: true}
 )
 

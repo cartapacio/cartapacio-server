@@ -11,18 +11,15 @@ module.exports =  function (req, res, next) {
 
   var doc = req.body
 
-  if(doc.doctype === 'project'){
-    utils.handleImages(doc, function (err, doc){
-      if(!err){
-        global.db.update({_id:req.params.id}, doc, function (err) {
-          if(!err){
-            res.send(doc)
-            next();
-          }
-        });
-      }
-    })
-  }
-
+  utils.handleImages(doc, function (err, doc){
+    if(!err){
+      global.db.update({_id:req.params.id}, doc, function (err) {
+        if(!err){
+          res.send(doc)
+          next();
+        }
+      });
+    }
+  })
 
 }

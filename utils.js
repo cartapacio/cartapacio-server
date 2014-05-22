@@ -10,37 +10,44 @@ var async = require('async'),
 
 var Utils = {
   handleImages: function(doc, callback){
-    var images = doc.images
-    var regex = /^data:(.*)\/(.*);(.*),(.*)/
 
-    async.each(images, function (image, next){
-      var data = regex.exec(image.file)
+    if(!('images' in doc)){
+      console.log('not images')
+      callback(null,doc)
+    } else {
+      var images = doc.images
+      var regex = /^data:(.*)\/(.*);(.*),(.*)/
 
-      // if the file is new
-      if(data){
-        var fileName = path.join( 'static', 'images', doc.doctype, slug(doc.title), uuid.v1()+'.'+data[2] )
+      async.each(images, function (image, next){
 
-        fs.outputFile(path.join(global.folder, fileName), data[4], data[3], function (err){
-          if(err){
-            next(err)
-          }
-          image.file = fileName
+        var data = regex.exec(image.file)
+
+        // if the file is new
+        if(data){
+          var fileName = path.join( 'static', 'images', doc.doctype, slug(doc.title), uuid.v1()+'.'+data[2] )
+
+          fs.outputFile(path.join(global.folder, fileName), data[4], data[3], function (err){
+            if(err){
+              next(err)
+            }
+            image.file = fileName
+            next(null)
+          })
+        } else {
+          // leave the field in the doc unmodified
           next(null)
-        })
-      } else {
-        // leave the field in the doc unmodified
-        next(null)
-      }
-    },
-     function (err){
-      if(err){
-        console.log( chalk.red('error writting image: '  + err) )
-        callback(err, null)
-      } else {
-        callback(null, doc)
-      }
-     }
-    )
+        }
+      },
+       function (err){
+        if(err){
+          console.log( chalk.red('error writting image: '  + err) )
+          callback(err, null)
+        } else {
+          callback(null, doc)
+        }
+       }
+      )
+    }
   }
 }
 

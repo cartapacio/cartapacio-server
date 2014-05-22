@@ -12,17 +12,19 @@ module.exports =  function (req, res, next) {
 
   var doc = req.body
 
-  if(doc.doctype === 'project'){
-    utils.handleImages(doc, function (err, doc){
-      if(!err){
-        global.db.insert(doc, function (err, newDoc) {
-          if(!err){
-            res.send(newDoc)
-            next();
-          }
-        });
-      }
-    })
-  }
+  utils.handleImages(doc, function (err, doc){
+    if(!err){
+      global.db.insert(doc, function (err, newDoc) {
+        if(!err){
+          res.send(newDoc)
+          next();
+        } else {
+          console.log( chalk.red(err) )
+        }
+      });
+    } else {
+      console.log( chalk.red(err) )
+    }
+  })
 
 }

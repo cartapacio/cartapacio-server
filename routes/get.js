@@ -8,10 +8,13 @@ module.exports =  function (req, res, next) {
   res.header('Access-Control-Allow-Origin', '*')
   res.header('Access-Control-Allow-Headers', 'X-Requested-With')
 
-  global.db.find({doctype:req.params.doctype}, function (err, docs) {
-    if(!err){
-      res.send(docs)
-      next();
-    }
-  });
+
+  global.db.find({doctype:req.params.doctype})
+    .sort(req.params.orderBy)
+    .exec( function (err, docs) {
+      if(!err){
+        res.send(docs)
+        next();
+      }
+    });
 }

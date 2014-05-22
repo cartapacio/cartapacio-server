@@ -11,7 +11,7 @@ module.exports =  function (req, res, next) {
 
   var doc = req.body
 
-  utils.handleImages(doc, function (err, doc){
+  utils.findKeys(doc, function (err, doc){
     if(!err){
       global.db.update({_id:req.params.id}, doc, function (err) {
         if(!err){

@@ -9,28 +9,70 @@ var async = require('async'),
 
 
 var Utils = {
-  handleImages: function(doc, callback){
+  findKeys: function(doc, callback){
+    this.doc = doc
+    this.callback = callback
 
-    if(!('images' in doc)){
-      console.log('not images')
-      callback(null,doc)
+    this.regex = /^data:(.*)\/(.*);(.*),(.*)/
+
+    if('images' in this.doc){
+      this.projectImages()
+    } else if('portrait' || 'full_cv' in this.doc){
+      this.cvFiles()
     } else {
-      var images = doc.images
-      var regex = /^data:(.*)\/(.*);(.*),(.*)/
+      this.callback(null, doc)
+    }
+  },
+  projectImages: function(){
+    var images = this.doc.images,
+      self = this
 
-      async.each(images, function (image, next){
+    async.each(images, function (image, next){
 
-        var data = regex.exec(image.file)
+      var data = self.regex.exec(image.file)
 
-        // if the file is new
+      // if the file is new
+      if(data){
+        var fileName = path.join( 'static', 'images', self.doc.doctype, slug(self.doc.title), uuid.v1()+'.'+data[2] )
+
+        fs.outputFile(path.join(global.folder, fileName), data[4], data[3], function (err){
+          if(err){
+            next(err)
+          }
+          image.file = fileName
+          next(null)
+        })
+      } else {
+        // leave the field in the doc unmodified
+        next(null)
+      }
+    },
+     function (err){
+      if(err){
+        console.log( chalk.red('error writting image: '  + err) )
+        self.callback(err, null)
+      } else {
+        self.callback(null, self.doc)
+      }
+     }
+    )
+  },
+  cvFiles: function(){
+    var portrait = this.doc.portrait,
+      cv = this.doc.full_cv,
+      self = this
+
+    async.parallel([
+      function (next){
+        var data = self.regex.exec(portrait)
         if(data){
-          var fileName = path.join( 'static', 'images', doc.doctype, slug(doc.title), uuid.v1()+'.'+data[2] )
+          var fileName = path.join( 'static', 'images', self.doc.doctype, uuid.v1()+'.'+data[2] )
 
           fs.outputFile(path.join(global.folder, fileName), data[4], data[3], function (err){
             if(err){
               next(err)
             }
-            image.file = fileName
+            self.doc.portrait = fileName
             next(null)
           })
         } else {
@@ -38,16 +80,31 @@ var Utils = {
           next(null)
         }
       },
-       function (err){
-        if(err){
-          console.log( chalk.red('error writting image: '  + err) )
-          callback(err, null)
+      function (next){
+        var data = self.regex.exec(cv)
+        if(data){
+          var fileName = path.join( 'static', 'pdf', self.doc.doctype, 'full_cv.'+data[2] )
+
+          fs.outputFile(path.join(global.folder, fileName), data[4], data[3], function (err){
+            if(err){
+              next(err)
+            }
+            self.doc.full_cv = fileName
+            next(null)
+          })
         } else {
-          callback(null, doc)
+          // leave the field in the doc unmodified
+          next(null)
         }
-       }
-      )
-    }
+      }
+    ], function (err){
+      if(err){
+        console.log( chalk.red('error writting file: '  + err) )
+        self.callback(err, null)
+      } else {
+        self.callback(null, self.doc)
+      }
+    })
   }
 }
 

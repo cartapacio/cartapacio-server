@@ -4,7 +4,7 @@ var chalk = require('chalk'),
   utils = require('../utils')
 
 module.exports =  function (req, res, next) {
-  console.log( chalk.gray('/ UPDATE' ) )
+  console.log( chalk.gray('/ UPDATE ' + req.params.id ) )
 
   res.header('Access-Control-Allow-Origin', '*')
   res.header('Access-Control-Allow-Headers', 'X-Requested-With')

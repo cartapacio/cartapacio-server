@@ -3,7 +3,7 @@
 var chalk = require('chalk')
 
 module.exports =  function (req, res, next) {
-  console.log( chalk.gray('/ DELETE' ) )
+  console.log( chalk.gray('/ DELETE ' + req.params.id ) )
 
   res.header('Access-Control-Allow-Origin', '*')
   res.header('Access-Control-Allow-Methods', 'DELETE')

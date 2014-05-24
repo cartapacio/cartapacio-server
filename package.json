@@ -25,7 +25,6 @@
     "restify-nedb": "^0.1.0",
     "nedb": "^0.10.5",
     "chalk": "^0.4.0",
-    "cartapacio-core": "git+https://github.com/cartapacio/cartapacio.core.git",
     "lodash": "^2.4.1",
     "fs-extra": "^0.8.1",
     "slug": "^0.5.0",

@@ -8,22 +8,24 @@ var restify = require('restify'),
 function Server (port, database) {
   this.PORT = port || 31173
   this.DB_NAME = database || 'cartapacio_db'
+
+  this.bootstrap()
 }
 
 Server.prototype.bootstrap = function() {
   // server config
-  var server = restify.createServer({
+  this.server = restify.createServer({
     name: 'cartapacio'
   })
 
-  server.use(restify.bodyParser({ mapParams: false }))
-  server.use(restify.CORS({
+  this.server.use(restify.bodyParser({ mapParams: false }))
+  this.server.use(restify.CORS({
     origins: ['*'],
     credentials: true,
     headers: ['Access-Control-Allow-Origin:*', 'Access-Control-Allow-Methods:POST']
   }))
-  server.use(restify.fullResponse())
-  server.use(restify.queryParser());
+  this.server.use(restify.fullResponse())
+  this.server.use(restify.queryParser());
 
 
   // // config
@@ -53,23 +55,30 @@ Server.prototype.bootstrap = function() {
 
 
   // router
-  server.post('/doc', post)
-  server.get('/doc', get)
-  server.del('/doc/:id', del)
-  server.put('/doc/:id', put)
+  this.server.post('/doc', post)
+  this.server.get('/doc', get)
+  this.server.del('/doc/:id', del)
+  this.server.put('/doc/:id', put)
 
-  server.get('/dbConfig', getDbPath)
-  server.post('/dbConfig', saveDbPath)
-  server.get(/^\/explorer\/(.*)/, explorer)
+  this.server.get('/dbConfig', getDbPath)
+  this.server.post('/dbConfig', saveDbPath)
+  this.server.get(/^\/explorer\/(.*)/, explorer)
 
   // static files
-  server.get(/\/static\/?.*/, restify.serveStatic({
+  this.server.get(/\/static\/?.*/, restify.serveStatic({
     directory: path.relative(__dirname, global.folder)
   }))
+}
 
-  server.listen(this.PORT, function() {
-    console.log( chalk.green(server.name + ' started @ ' + server.url) )
+Server.prototype.init = function() {
+  var self = this
+  this.server.listen(this.PORT, function() {
+    console.log( chalk.green(self.server.name + ' started @ ' + self.server.url) )
   })
 }
+
+Server.prototype.stop = function() {
+   this.server.close()
+};
 
 module.exports = Server

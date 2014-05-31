@@ -7,10 +7,10 @@ var chalk = require('chalk'),
 
 
 module.exports =  function (req, res, next) {
-  console.log( chalk.gray('/ GET explorer ' + req.params[0] ) )
+  console.log( chalk.gray('/ GET explorer ' + req.params.path ) )
 
   var root =  process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE,
-    folder = req.params[0],
+    folder = req.params.path,
     fullPath = path.join(root, folder),
     excludeDot = /^([^.][\w\W]+)/,
     folderList = new Array()
@@ -31,7 +31,7 @@ module.exports =  function (req, res, next) {
             if(stats.isDirectory()){
               folderList.push({
                 name: file,
-                path: current
+                path: folder
               })
             }
             callback(null)
@@ -44,7 +44,10 @@ module.exports =  function (req, res, next) {
         if(err){
           throw err
         }
-        res.send(folderList)
+        res.send({
+          up: path.resolve(folder, '..'),
+          content: folderList
+        })
         next()
       })
   })

@@ -1,7 +1,6 @@
 'use strict';
 
 var restify = require('restify'),
-  Datastore = require('nedb'),
   path = require('path'),
   fs = require('fs-extra'),
   chalk = require('chalk')
@@ -43,18 +42,14 @@ Server.prototype.bootstrap = function() {
     fs.mkdirsSync(global.folder);
   }
 
-  // database
-  global.db = new Datastore(
-    { filename: path.join(global.folder, this.DB_NAME),
-    autoload: true}
-  )
-
   //routes
   var post = require('./routes/post'),
     get = require('./routes/get'),
     del = require('./routes/delete'),
     put = require('./routes/put'),
-    explorer = require('./routes/explorer')
+    explorer = require('./routes/explorer'),
+    getDbPath = require('./routes/getDbPath'),
+    saveDbPath = require('./routes/saveDbPath')
 
 
   // router
@@ -63,6 +58,8 @@ Server.prototype.bootstrap = function() {
   server.del('/doc/:id', del)
   server.put('/doc/:id', put)
 
+  server.get('/dbConfig', getDbPath)
+  server.post('/dbConfig', saveDbPath)
   server.get(/^\/explorer\/(.*)/, explorer)
 
   // static files

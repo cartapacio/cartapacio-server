@@ -50,16 +50,20 @@ Server.prototype.bootstrap = function() {
   )
 
   //routes
-  var post = require('./routes/post')
-  var get = require('./routes/get')
-  var del = require('./routes/delete')
-  var put = require('./routes/put')
+  var post = require('./routes/post'),
+    get = require('./routes/get'),
+    del = require('./routes/delete'),
+    put = require('./routes/put'),
+    explorer = require('./routes/explorer')
+
 
   // router
   server.post('/doc', post)
   server.get('/doc', get)
   server.del('/doc/:id', del)
   server.put('/doc/:id', put)
+
+  server.get(/^\/explorer\/(.*)/, explorer)
 
   // static files
   server.get(/\/static\/?.*/, restify.serveStatic({

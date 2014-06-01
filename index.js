@@ -51,18 +51,26 @@ Server.prototype.bootstrap = function() {
     put = require('./routes/put'),
     explorer = require('./routes/explorer'),
     getDbPath = require('./routes/getDbPath'),
-    saveDbPath = require('./routes/saveDbPath')
+    saveDbPath = require('./routes/saveDbPath'),
+    build = require('./routes/build'),
+    upload = require('./routes/upload')
 
 
   // router
+  // document management
   this.server.post('/doc', post)
   this.server.get('/doc', get)
   this.server.del('/doc/:id', del)
   this.server.put('/doc/:id', put)
 
+  // configuration
   this.server.get('/dbConfig', getDbPath)
   this.server.post('/dbConfig', saveDbPath)
   this.server.get(/^\/explorer\/(.*)/, explorer)
+
+  // actions
+  this.server.get('/build', build)
+  this.server.get('/upload', upload)
 
   // static files
   this.server.get(/\/static\/?.*/, restify.serveStatic({

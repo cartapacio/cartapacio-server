@@ -2,10 +2,15 @@
 
 var restify = require('restify'),
   path = require('path'),
-  fs = require('fs-extra'),
-  chalk = require('chalk')
+  chalk = require('chalk'),
+  Database = require('./database')
 
-function Server (port, database) {
+function Server (dataPath, port, database) {
+  if(!dataPath){
+    throw new Error ('a path MUST be provided')
+  }
+
+  global.folder = dataPath
   this.PORT = port || 31173
   this.DB_NAME = database || 'cartapacio_db'
 
@@ -27,28 +32,8 @@ Server.prototype.bootstrap = function() {
   this.server.use(restify.fullResponse())
   this.server.use(restify.queryParser());
 
-
-  // // config
-  // var PORT = 31173,
-  //   DB_NAME = 'cartapacio_db'
-
-  // user directory
-  try{
-    var config = require('./localConfig.json')
-    console.log( chalk.green('root path: ' + config.path) )
-    global.folder = config.path
-  } catch (err) {
-    throw new Error('config file not found')
-  }
-    //
-
-  // if directory does not exist will be created
-  try{
-    fs.lstatSync(global.folder).isDirectory()
-  } catch (error) {
-    console.log( chalk.yellow('user directory does not exist, creating it ...') )
-    fs.mkdirsSync(global.folder);
-  }
+  //setup database
+  new Database(global.folder)
 
   //routes
   var post = require('./routes/post'),

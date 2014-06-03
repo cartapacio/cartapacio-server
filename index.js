@@ -33,8 +33,14 @@ Server.prototype.bootstrap = function() {
   //   DB_NAME = 'cartapacio_db'
 
   // user directory
-  var home = process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE
-  global.folder = path.join(home, 'webpage')
+  try{
+    var config = require('./localConfig.json')
+    console.log( chalk.green('root path: ' + config.path) )
+    global.folder = config.path
+  } catch (err) {
+    throw new Error('config file not found')
+  }
+    //
 
   // if directory does not exist will be created
   try{

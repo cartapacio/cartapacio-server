@@ -1,7 +1,7 @@
 'use strict';
 
 var chalk = require('chalk'),
-  utils = require('../utils')
+  Files = require('../utils/fileProcessor')
 
 module.exports =  function (req, res, next) {
   console.log( chalk.gray('/ UPDATE ' + req.params.id ) )
@@ -11,15 +11,26 @@ module.exports =  function (req, res, next) {
 
   var doc = req.body
 
-  utils.findKeys(doc, function (err, doc){
-    if(!err){
-      global.db.update({_id:req.params.id}, doc, function (err) {
-        if(!err){
-          res.send(doc)
-          next();
-        }
-      });
-    }
+  new Files(doc, function (finalDoc){
+    global.db.update({_id:req.params.id}, finalDoc, function (err) {
+      if(!err){
+        res.send(finalDoc)
+        next();
+      } else {
+        console.log( chalk.red(err) )
+      }
+    })
   })
+
+  // utils.findKeys(doc, function (err, doc){
+  //   if(!err){
+  //     global.db.update({_id:req.params.id}, doc, function (err) {
+  //       if(!err){
+  //         res.send(doc)
+  //         next();
+  //       }
+  //     });
+  //   }
+  // })
 
 }
